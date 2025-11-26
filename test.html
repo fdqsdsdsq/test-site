@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tutoriel GitanX UI Library</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Tutoriel et documentation rapide pour la GitanX UI Library — exemples: Buttons, Toggles, Sliders, Dropdowns, Notifications, Thèmes, et script final." />
+
+  <style>
+    /* Variables (dark + light variants) */
+    :root{
+      --bg: #141a24;
+      --panel: #1b2330;
+      --muted-panel-border: #2a3750;
+      --text: #eaf0ff;
+      --muted: #98a6bf;
+      --accent: #4a8cff;
+      --accent-strong: #2f6fe6;
+      --card-radius: 12px;
+      --glass-shadow: 0 6px 20px rgba(0,0,0,0.35);
+      --glass-elev: 0 10px 30px rgba(0,0,0,0.45);
+      --mono: ui-monospace, SFMono-Regular, SF Mono, "Roboto Mono", "Segoe UI Mono", "Helvetica Neue", monospace;
+      --ui-font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --max-width: 980px;
+      --kb: 14px;
+    }
+
+    /* Light mode overrides */
+    body.light {
+      --bg: #f3f5f8;
+      --panel: #ffffff;
+      --muted-panel-border: #e3e6ea;
+      --text: #0f1720;
+      --muted: #6b7280;
+      --accent: #2b6ce6;
+      --accent-strong: #1751d9;
+      --glass-shadow: 0 6px 20px rgba(12,18,30,0.06);
+      --glass-elev: 0 10px 30px rgba(12,18,30,0.08);
+    }
+
+    /* Base */
+    html,body{height:100%}
+    body {
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:var(--ui-font);
+      line-height:1.6;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      transition: background .25s ease, color .25s ease;
+      padding-bottom:120px;
+    }
+
+    a { color:inherit; text-decoration:none; }
+
+    /* Skip link for accessibility */
+    .skip-link{
+      position:absolute;
+      left:-9999px;
+      top:auto;
+      width:1px;
+      height:1px;
+      overflow:hidden;
+    }
+    .skip-link:focus{
+      left:1rem; top:1rem; width:auto; height:auto; background:var(--panel); color:var(--text); padding:.5rem .75rem; border-radius:6px; z-index:2000;
+      box-shadow:var(--glass-elev);
+    }
+
+    header {
+      position:sticky;
+      top:0;
+      z-index:1200;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent), var(--panel);
+      border-bottom:1px solid var(--muted-panel-border);
+      padding:16px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      justify-content:center;
+      backdrop-filter: blur(6px);
+    }
+
+    .brand {
+      font-weight:700;
+      color:var(--accent);
+      letter-spacing:0.2px;
+      margin-right:auto;
+      margin-left:12px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-size:18px;
+    }
+    .brand .logo {
+      width:34px; height:34px; border-radius:8px; background:linear-gradient(135deg,var(--accent),var(--accent-strong)); box-shadow:var(--glass-elev);
+      display:inline-block;
+    }
+
+    nav {
+      display:flex;
+      gap:12px;
+      align-items:center;
+      flex-wrap:wrap;
+      justify-content:center;
+      padding:6px;
+    }
+
+    nav a {
+      color:var(--text);
+      padding:8px 12px;
+      border-radius:8px;
+      font-weight:600;
+      font-size:14px;
+      transition: background .18s ease, color .18s ease, transform .12s ease;
+      border:1px solid transparent;
+    }
+    nav a:focus,
+    nav a:hover{
+      background: rgba(74,140,255,0.08);
+      color:var(--accent);
+      transform:translateY(-1px);
+      outline:none;
+    }
+
+    /* Mobile menu */
+    .nav-toggle{
+      display:none;
+      background:transparent;
+      border:1px solid transparent;
+      padding:8px;
+      border-radius:8px;
+      cursor:pointer;
+      color:var(--text);
+    }
+    .nav-toggle:focus{ outline:2px solid color-mix(in srgb, var(--accent) 30%, transparent); }
+
+    .container{
+      max-width:var(--max-width);
+      margin:24px auto;
+      padding:24px;
+    }
+
+    h1,h2,h3{
+      color:var(--accent);
+      margin:0 0 12px 0;
+      font-weight:700;
+      line-height:1.15;
+    }
+    h1{ font-size:28px; margin-bottom:20px; }
+    h2{ font-size:20px; }
+    h3{ font-size:16px; color:var(--text); font-weight:700;}
+
+    .card{
+      background:var(--panel);
+      border:1px solid var(--muted-panel-border);
+      border-radius:var(--card-radius);
+      padding:22px;
+      margin-bottom:22px;
+      box-shadow:var(--glass-shadow);
+      transition: transform .14s ease, box-shadow .14s ease;
+    }
+    .card:focus-within{ box-shadow:var(--glass-elev); transform:translateY(-2px); }
+
+    /* code blocks */
+    pre {
+      background: color-mix(in srgb, var(--panel) 85%, black 8%);
+      color:var(--text);
+      padding:14px;
+      border-radius:8px;
+      overflow:auto;
+      margin-top:12px;
+      margin-bottom:14px;
+      font-family: var(--mono);
+      font-size:13px;
+      line-height:1.45;
+      border:1px solid color-mix(in srgb, var(--muted-panel-border) 75%, transparent 25%);
+    }
+
+    /* Button styles */
+    .btn {
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      background:linear-gradient(180deg,var(--accent), var(--accent-strong));
+      color:white;
+      border:none;
+      padding:8px 14px;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:700;
+      box-shadow:0 6px 18px rgba(42,131,255,0.14);
+      transition: transform .12s ease, filter .12s ease, box-shadow .12s ease;
+    }
+    .btn:active{ transform:translateY(1px) scale(.997); }
+    .btn:focus{ outline:2px solid color-mix(in srgb, var(--accent) 20%, transparent); }
+
+    /* small secondary button */
+    .btn-ghost {
+      background:transparent;
+      border:1px solid var(--muted-panel-border);
+      padding:6px 12px;
+      color:var(--text);
+      border-radius:8px;
+      font-weight:600;
+    }
+
+    /* copy notification */
+    #notif {
+      position:fixed;
+      right:20px;
+      bottom:120px;
+      background:var(--accent);
+      color:white;
+      padding:10px 14px;
+      border-radius:10px;
+      display:flex;
+      gap:8px;
+      align-items:center;
+      font-weight:700;
+      box-shadow:var(--glass-elev);
+      transform:translateY(10px);
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .22s ease, transform .22s ease;
+    }
+    #notif.show{ opacity:1; transform:translateY(0); pointer-events:auto; }
+
+    /* theme button & menu */
+    #themeToggle {
+      position:fixed;
+      bottom:22px;
+      right:22px;
+      width:54px;
+      height:54px;
+      border-radius:50%;
+      background:linear-gradient(180deg,var(--accent), var(--accent-strong));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      box-shadow:var(--glass-elev);
+      border:none;
+      z-index:1400;
+    }
+    #themeToggle:focus{ outline:3px solid color-mix(in srgb, var(--accent) 18%, transparent); }
+    #themeToggle .icon{
+      width:22px; height:22px; border-radius:4px; background:white;
+    }
+    #themeMenu{
+      position:fixed;
+      right:22px;
+      bottom:86px;
+      background:var(--panel);
+      border:1px solid var(--muted-panel-border);
+      border-radius:10px;
+      padding:10px;
+      display:none;
+      gap:8px;
+      z-index:1400;
+      box-shadow:var(--glass-shadow);
+    }
+    #themeMenu button{ background:transparent; border:1px solid transparent; color:var(--text); padding:8px 10px; border-radius:8px; cursor:pointer; }
+    #themeMenu button:focus{ outline:2px solid color-mix(in srgb, var(--accent) 20%, transparent); }
+
+    /* layout helpers */
+    .row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+    .right { margin-left:auto; }
+
+    /* responsive */
+    @media (max-width: 820px){
+      .container{ padding:18px; }
+      nav { display:none; } /* we'll show toggle */
+      .nav-toggle{ display:inline-flex; margin-left:auto; }
+    }
+    @media (max-width: 520px) {
+      .card { padding:16px; }
+      pre { font-size:12px; }
+      #themeMenu { right:12px; bottom:80px; }
+    }
+  </style>
+</head>
+<body>
+
+  <a class="skip-link" href="#main">Aller au contenu</a>
+
+  <header role="banner" aria-label="Navigation principale">
+    <div class="brand" aria-hidden="true">
+      <span class="logo" aria-hidden="true"></span>
+      <span>GitanX UI</span>
+    </div>
+
+    <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="mainNav" aria-label="Ouvrir le menu">☰</button>
+
+    <nav id="mainNav" role="navigation" aria-label="Liens de la documentation">
+      <a href="#installation">Installation</a>
+      <a href="#buttons">Boutons</a>
+      <a href="#toggles">Toggles</a>
+      <a href="#sliders">Sliders</a>
+      <a href="#dropdowns">Dropdowns</a>
+      <a href="#notifications">Notifications</a>
+      <a href="#themes">Thèmes</a>
+      <a href="#script-final">Script final</a>
+    </nav>
+  </header>
+
+  <main id="main" class="container" role="main">
+    <h1>Tutoriel GitanX UI Library</h1>
+
+    <!-- Installation -->
+    <section id="installation" class="card" aria-labelledby="installation-title">
+      <h2 id="installation-title">Installation</h2>
+
+      <pre id="install" tabindex="0">
+local GitanX = loadstring(game:HttpGet("https://raw.githubusercontent.com/fsqddsfdqsfd/Site/refs/heads/main/test1.lua"))()
+      </pre>
+
+      <div class="row" style="margin-top:8px;">
+        <button class="btn" onclick="copyCode('install')" aria-label="Copier le code d'installation">Copier le code</button>
+      </div>
+
+      <h3 style="margin-top:18px;">Résultat complet :</h3>
+      <pre tabindex="0">
+local GitanX = loadstring(game:HttpGet("https://raw.githubusercontent.com/fsqddsfdqsfd/Site/refs/heads/main/test1.lua"))()
+local Library = GitanX:CreateWindow({
+    Name = "GitanX Menu",
+    Theme = "Amethyst"
+})
+local TabGameplay = Library:CreateTab("Gameplay")
+local Section = TabGameplay:CreateSection("Actions")
+      </pre>
+    </section>
+
+    <!-- Buttons -->
+    <section id="buttons" class="card" aria-labelledby="buttons-title">
+      <h2 id="buttons-title">Boutons</h2>
+
+      <pre id="button" tabindex="0">
+Section:CreateButton({
+    Name = "Nom du bouton",
+    Callback = function()
+        -- votre script ici
+    end
+})
+      </pre>
+
+      <div class="row" style="margin-top:8px;">
+        <button class="btn" onclick="copyCode('button')" aria-label="Copier code bouton">Copier le code</button>
+        <button class="btn-ghost" onclick="previewSnippet('button')">Aperçu</button>
+      </div>
+
+      <h3 style="margin-top:18px;">Résultat complet :</h3>
+      <pre tabindex="0">
+Section:CreateButton({
+    Name = "Boost vitesse",
+    Callback = function()
+        local hum = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+        if hum then hum.WalkSpeed = 50 end
+    end
+})
+      </pre>
+    </section>
+
+    <!-- Toggles -->
+    <section id="toggles" class="card" aria-labelledby="toggles-title">
+      <h2 id="toggles-title">Toggles</h2>
+
+      <pre id="toggle" tabindex="0">
+Section:CreateToggle({
+    Name = "Nom du toggle",
+    CurrentValue = false,
+    Callback = function(state)
+        -- votre script ici
+    end
+})
+      </pre>
+
+      <div class="row" style="margin-top:8px;">
+        <button class="btn" onclick="copyCode('toggle')">Copier le code</button>
+      </div>
+
+      <h3 style="margin-top:18px;">Résultat complet :</h3>
+      <pre tabindex="0">
+Section:CreateToggle({
+    Id = "InvincibleToggle",
+    Name = "Mode invincible",
+    CurrentValue = false,
+    Callback = function(state)
+        local hum = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+        if hum then
+            hum.MaxHealth = state and math.huge or 100
+            hum.Health    = state and math.huge or 100
+        end
+    end
+})
+      </pre>
+    </section>
+
+    <!-- Sliders -->
+    <section id="sliders" class="card" aria-labelledby="sliders-title">
+      <h2 id="sliders-title">Sliders</h2>
+
+      <pre id="slider" tabindex="0">
+Section:CreateSlider({
+    Name = "Nom du slider",
+    Range = {0,100},
+    Increment = 1,
+    CurrentValue = 0,
+    Callback = function(val)
+        -- votre script ici
+    end
+})
+      </pre>
+
+      <div class="row" style="margin-top:8px;">
+        <button class="btn" onclick="copyCode('slider')">Copier le code</button>
+      </div>
+
+      <h3 style="margin-top:18px;">Résultat complet :</h3>
+      <pre tabindex="0">
+Section:CreateSlider({
+    Id = "SpeedSlider",
+    Name = "Vitesse",
+    Range = {16, 120},
+    Increment = 1,
+    CurrentValue = 16,
+    Callback = function(val)
+        local hum = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+        if hum then hum.WalkSpeed = val end
+    end
+})
+      </pre>
+    </section>
+
+    <!-- Dropdowns -->
+    <section id="dropdowns" class="card" aria-labelledby="dropdowns-title">
+      <h2 id="dropdowns-title">Dropdowns</h2>
+
+      <pre id="dropdown" tabindex="0">
+Section:CreateDropdown({
+    Name = "Nom du dropdown",
+    Options = {"Option1","Option2","Option3"},
+    CurrentOption = "Option1",
+    Callback = function(choice)
+        -- votre script ici
+    end
+})
+      </pre>
+
+      <div class="row" style="margin-top:8px;">
+        <button class="btn" onclick="copyCode('dropdown')">Copier le code</button>
+      </div>
+
+      <h3 style="margin-top:18px;">Résultat complet :</h3>
+      <pre tabindex="0">
+Section:CreateDropdown({
+    Id = "SpeedChoice",
+    Name = "Choix de vitesse",
+    Options = {"16","50","100"},
+    CurrentOption = "16",
+    Callback = function(choice)
+        local hum = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+        if hum then hum.WalkSpeed = tonumber(choice) end
+    end
+})
+      </pre>
+    </section>
+
+    <!-- Notifications -->
+    <section id="notifications" class="card" aria-labelledby="notifications-title">
+      <h2 id="notifications-title">Notifications</h2>
+
+      <pre id="notify" tabindex="0">
+Library:Notify({
+    Title = "Titre",
+    Content = "Message",
+    Type = "Info",
+    Duration = 3
+})
+      </pre>
+
+      <div class="row" style="margin-top:8px;">
+        <button class="btn" onclick="copyCode('notify')">Copier le code</button>
+      </div>
+
+      <h3 style="margin-top:18px;">Résultat complet :</h3>
+      <pre tabindex="0">
+Library:Notify({
+    Title = "GitanX",
+    Content = "Interface chargée avec succès.",
+    Type = "Success",
+    Duration = 3
+})
+      </pre>
+    </section>
+
+    <!-- Themes -->
+    <section id="themes" class="card" aria-labelledby="themes-title">
+      <h2 id="themes-title">Changer de thème</h2>
+
+      <pre id="theme" tabindex="0">
+Library:ChangeTheme("Ocean") -- Thèmes disponibles: Default, Ocean, Amethyst, Light
+      </pre>
+
+      <div class="row" style="margin-top:8px;">
+        <button class="btn" onclick="copyCode('theme')">Copier le code</button>
+      </div>
+
+      <h3 style="margin-top:18px;">Résultat complet :</h3>
+      <pre tabindex="0">
+Section:CreateDropdown({
+    Id = "ThemeDropdown",
+    Name = "Thème",
+    Options = {"Default","Ocean","Amethyst","Light"},
+    CurrentOption = "Amethyst",
+    Callback = function(choice)
+        Library:ChangeTheme(choice)
+    end
+})
+      </pre>
+    </section>
+
+    <!-- Script final -->
+    <section id="script-final" class="card" aria-labelledby="final-title">
+      <h2 id="final-title">Script final</h2>
+
+      <pre id="final" tabindex="0">
+local GitanX = loadstring(game:HttpGet("https://raw.githubusercontent.com/fsqddsfdqsfd/Site/refs/heads/main/test1.lua"))()
+
+local Library = GitanX:CreateWindow({
+    Name = "GitanX Menu",
+    Theme = "Amethyst"
+})
+
+local TabGameplay = Library:CreateTab("Gameplay")
+local Section = TabGameplay:CreateSection("Actions")
+
+Section:CreateButton({
+    Name = "Boost vitesse",
+    Callback = function()
+        local hum = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+        if hum then hum.WalkSpeed = 50 end
+    end
+})
+
+Section:CreateToggle({
+    Id = "InvincibleToggle",
+    Name = "Mode invincible",
+    CurrentValue = false,
+    Callback = function(state)
+        local hum = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+        if hum then
+            hum.MaxHealth = state and math.huge or 100
+            hum.Health    = state and math.huge or 100
+        end
+    end
+})
+
+Section:CreateSlider({
+    Id = "SpeedSlider",
+    Name = "Vitesse",
+    Range = {16, 120},
+    Increment = 1,
+    CurrentValue = 16,
+    Callback = function(val)
+        local hum = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+        if hum then hum.WalkSpeed = val end
+    end
+})
+
+Section:CreateDropdown({
+    Id = "SpeedChoice",
+    Name = "Choix de vitesse",
+    Options = {"16","50","100"},
+    CurrentOption = "16",
+    Callback = function(choice)
+        local hum = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+        if hum then hum.WalkSpeed = tonumber(choice) end
+    end
+})
+
+local TabUI = Library:CreateTab("Interface")
+local SectionUI = TabUI:CreateSection("Réglages")
+
+SectionUI:CreateDropdown({
+    Id = "ThemeDropdown",
+    Name = "Thème",
+    Options = {"Default","Ocean","Amethyst","Light"},
+    CurrentOption = "Amethyst",
+    Callback = function(choice)
+        Library:ChangeTheme(choice)
+    end
+})
+
+SectionUI:CreateKeybind({
+    Id = "ToggleMenuKey",
+    Name = "Raccourci menu",
+    CurrentKey = Enum.KeyCode.RightControl,
+    Callback = function()
+        Library:Notify({
+            Title = "Keybind",
+            Content = "Menu key pressed",
+            Type = "Info",
+            Duration = 2
+        })
+    end
+})
+
+Library:Notify({
+    Title = "GitanX",
+    Content = "Interface chargée avec succès.",
+    Type = "Success",
+    Duration = 3
+})
+      </pre>
+
+      <div class="row" style="margin-top:12px;">
+        <button class="btn" onclick="copyCode('final')">Copier le code</button>
+        <button class="btn-ghost" onclick="downloadSnippet('final')">Télécharger</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Copy notification -->
+  <div id="notif" role="status" aria-live="polite">Code copié !</div>
+
+  <!-- Theme toggle button -->
+  <button id="themeToggle" aria-haspopup="menu" aria-expanded="false" aria-controls="themeMenu" title="Changer le thème">
+    <span class="icon" aria-hidden="true"></span>
+  </button>
+
+  <!-- Theme menu -->
+  <div id="themeMenu" role="menu" aria-hidden="true">
+    <button role="menuitem" onclick="setTheme('dark')">🌑 Sombre</button>
+    <button role="menuitem" onclick="setTheme('light')">☀️ Clair</button>
+    <button role="menuitem" onclick="setTheme('auto')">⚙️ Auto</button>
+  </div>
+
+  <script>
+    /* Utility: read code text from pre by id and copy exactly. --
+       Important: the page must not modify the content of the code blocks
+       (per your request: "laisser les script de tuto et resultat"). */
+    function copyCode(id){
+      const el = document.getElementById(id);
+      if(!el) return;
+      const code = el.textContent; // preserve exact content, don't modify
+      navigator.clipboard.writeText(code).then(()=>{
+        showNotif('Code copié !');
+      }).catch(()=>{ showNotif('Impossible de copier'); });
+    }
+
+    function previewSnippet(id){
+      const el = document.getElementById(id);
+      if(!el) return;
+      // Simple preview: open in a new window as plain text for safety
+      const code = el.textContent;
+      const w = window.open("", "_blank", "noopener");
+      w.document.title = "Aperçu - " + id;
+      const pre = w.document.createElement('pre');
+      pre.style.whiteSpace = 'pre-wrap';
+      pre.style.fontFamily = 'monospace';
+      pre.textContent = code;
+      w.document.body.style.background = '#0b1020';
+      w.document.body.style.color = '#eaf0ff';
+      w.document.body.style.margin = '12px';
+      w.document.body.appendChild(pre);
+    }
+
+    function downloadSnippet(id){
+      const el = document.getElementById(id);
+      if(!el) return;
+      const code = el.textContent;
+      const blob = new Blob([code], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = id + '.lua';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function showNotif(text){
+      const n = document.getElementById('notif');
+      n.textContent = text;
+      n.classList.add('show');
+      setTimeout(()=>{ n.classList.remove('show'); }, 2000);
+    }
+
+    // Theme handling (persist in localStorage)
+    let mode = localStorage.getItem('gitanx_theme') || 'dark';
+    const themeBtn = document.getElementById("themeToggle");
+    const themeMenu = document.getElementById("themeMenu");
+    const nav = document.getElementById('mainNav');
+    const navToggle = document.getElementById('navToggle');
+
+    function applyTheme(){
+      if(mode === 'light'){
+        document.body.classList.add('light');
+        themeBtn.setAttribute('aria-expanded','true');
+      } else if(mode === 'dark'){
+        document.body.classList.remove('light');
+        themeBtn.setAttribute('aria-expanded','false');
+      } else { // auto
+        const prefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
+        if(prefersLight) document.body.classList.add('light'); else document.body.classList.remove('light');
+      }
+      localStorage.setItem('gitanx_theme', mode);
+      // update theme menu ARIA
+      themeMenu.setAttribute('aria-hidden', mode ? 'false' : 'true');
+    }
+
+    function setTheme(newMode){
+      mode = newMode;
+      applyTheme();
+      themeMenu.style.display = 'none';
+    }
+
+    themeBtn.addEventListener('click', ()=>{
+      const open = themeMenu.style.display === 'flex';
+      themeMenu.style.display = open ? 'none' : 'flex';
+      themeMenu.style.flexDirection = 'column';
+      themeMenu.style.alignItems = 'stretch';
+      themeMenu.setAttribute('aria-hidden', open ? 'true' : 'false');
+      themeBtn.setAttribute('aria-expanded', !open);
+    });
+
+    // Nav toggle for mobile
+    navToggle.addEventListener('click', ()=>{
+      const shown = getComputedStyle(nav).display !== 'none';
+      if(shown){
+        nav.style.display = 'none';
+        navToggle.setAttribute('aria-expanded','false');
+      } else {
+        nav.style.display = 'flex';
+        nav.style.flexDirection = 'column';
+        nav.style.position = 'absolute';
+        nav.style.left = '16px';
+        nav.style.top = '64px';
+        nav.style.background = 'var(--panel)';
+        nav.style.padding = '12px';
+        nav.style.boxShadow = 'var(--glass-elev)';
+        navToggle.setAttribute('aria-expanded','true');
+      }
+    });
+
+    // Close menus on ESC
+    window.addEventListener('keydown', (e)=>{
+      if(e.key === 'Escape'){
+        themeMenu.style.display = 'none';
+        if(window.getComputedStyle(nav).display !== 'none' && window.innerWidth <= 820){
+          nav.style.display = 'none';
+          navToggle.setAttribute('aria-expanded','false');
+        }
+      }
+    });
+
+    // Initialize
+    applyTheme();
+
+    // Accessibility improvement: focus outline visible when using keyboard
+    (function(){
+      function handleFirstTab(e){
+        if(e.key === 'Tab'){
+          document.documentElement.classList.add('show-focus');
+          window.removeEventListener('keydown', handleFirstTab);
+        }
+      }
+      window.addEventListener('keydown', handleFirstTab);
+    })();
+
+    // Allow users to long-press theme button to cycle modes (useful on mobile)
+    let themePressTimer = null;
+    themeBtn.addEventListener('pointerdown', ()=>{
+      themePressTimer = setTimeout(()=>{
+        // cycle: dark -> light -> auto -> dark
+        if(mode === 'dark') mode = 'light';
+        else if(mode === 'light') mode = 'auto';
+        else mode = 'dark';
+        applyTheme();
+        showNotif('Thème : ' + mode);
+      }, 700);
+    });
+    themeBtn.addEventListener('pointerup', ()=>{ clearTimeout(themePressTimer); });
+
+    // Improve code block keyboard selection: allow Ctrl+A inside pre elements
+    document.querySelectorAll('pre').forEach(pre=>{
+      pre.addEventListener('keydown', (e)=> {
+        if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'a'){
+          e.preventDefault();
+          const range = document.createRange();
+          range.selectNodeContents(pre);
+          const sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
